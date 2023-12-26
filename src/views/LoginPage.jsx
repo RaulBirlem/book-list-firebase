@@ -2,6 +2,7 @@ import FullPageLoader from '../components/FullPageLoader.jsx';
 import {useState} from 'react';
 import {auth} from "../firebase/config.js"
 import {createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword  } from "firebase/auth";
 
 function LoginPage() {
@@ -49,7 +50,11 @@ function LoginPage() {
       });
   }
 
-
+  function handlePasswordReset() {
+    const email = prompt('Digite seu email:');
+    sendPasswordResetEmail(auth,email);
+    alert('Email enviado, verifique sua caixa de spam!')
+  }
 
 
   
@@ -97,7 +102,7 @@ function LoginPage() {
                   }
                   
 
-                  <p className="forgot-password">Forgot Password?</p>
+                  <p onClick={handlePasswordReset} className="forgot-password">Forgot Password?</p>
                   
               </form>
           </section>
