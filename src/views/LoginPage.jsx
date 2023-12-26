@@ -1,12 +1,39 @@
 import FullPageLoader from '../components/FullPageLoader.jsx';
 import {useState} from 'react';
 import {auth} from "../firebase/config.js"
+import {createUserWithEmailAndPassword } from "firebase/auth";
 
 function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState('login');
+  const [userCredentials, setUserCredentials] = useState({});
 
   console.log(auth);
+
+  function handleCredentials(e){
+    setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
+    console.log(userCredentials);
+  }
+
+  function handleSignUp(e) {
+    e.preventDefault();
+    createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
+    .then((userCredential) => {
+    // Signed up 
+    const user = userCredential.user;
+    console.log(user)
+    // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode)
+      console.log(errorMessage)
+      // ..
+    });
+  }
+
+
   
     return (
       <>
@@ -31,17 +58,17 @@ function LoginPage() {
             <form className="add-form login">
                   <div className="form-control">
                       <label>Email *</label>
-                      <input type="text" name="email" placeholder="Enter your email" />
+                      <input onChange={(e)=>{handleCredentials(e)}}type="text" name="email" placeholder="Enter your email" />
                   </div>
                   <div className="form-control">
                       <label>Password *</label>
-                      <input type="password" name="password" placeholder="Enter your password" />
+                      <input onChange={(e)=>{handleCredentials(e)}} type="password" name="password" placeholder="Enter your password" />
                   </div>
                   {
                     loginType == 'login' ?
                     <button className="active btn btn-block">Login</button>
                     : 
-                    <button className="active btn btn-block">Sign Up</button>
+                    <button onClick={(e)=>{handleSignUp(e)}}className="active btn btn-block">Sign Up</button>
                   }
 
                   <p className="forgot-password">Forgot Password?</p>
