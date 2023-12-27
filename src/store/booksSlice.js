@@ -23,15 +23,31 @@ export const booksSlice = createSlice({
           }
         });
     }
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(fetchBooks.pending, (state, action) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchBooks.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        // Add any fetched posts to the array
+        state.books = action.payload;
+      })
+      .addCase(fetchBooks.rejected, (state, action) => {
+        state.status = 'failed'
+        console.log(action.error.message)
+      })
   }
 })
+
 
 export const { addBook, eraseBook, toggleRead } = booksSlice.actions;
 
 export const selectBooks = state => state.books;
 
 export default booksSlice.reducer;
-
+/* middleware: */
 export const fetchBooks = createAsyncThunk('books/fetchBooks', async () =>{
   const q = query(collection(db,"books"), where("user_id", "==", auth.currentUser.uid))
   const querySnapshot = await getDocs(q)
