@@ -2,6 +2,7 @@ import FullPageLoader from '../components/FullPageLoader.jsx';
 import {useState} from 'react';
 import {auth} from "../firebase/config.js"
 import {createUserWithEmailAndPassword,
+  onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword  } from "firebase/auth";
 import { useDispatch } from 'react-redux';
@@ -16,13 +17,25 @@ import { setUser } from '../store/usersSlice.js';
 
 function LoginPage() {
 
+
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState('login');
   const [userCredentials, setUserCredentials] = useState({});
   const [error,setError] = useState('');
 
-  console.log(auth);
+  onAuthStateChanged(auth,(user)=>{
+  /* Sempre q há alteração ou na primeira renderização */
+  /* essa função irá buscar os dados do usuário */
+  /* se não tiver ele retorna null */
+  /* mantém o usuário logado mesmo trocando de rotas */
+    if(user){
+    dispatch(setUser({id:user.uid, email:user.email}));
+      
+    }else {
+      dispatch(setUser(null));
+  }
+  });
 
   function handleCredentials(e){
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
@@ -33,12 +46,6 @@ function LoginPage() {
     e.preventDefault();
     setError("")
     createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-    .then((userCredential) => {
-    // Signed up 
-      console.log(userCredential.user)
-      dispatch(setUser({id:userCredential.user.uid, email:userCredential.user.email}))
-      
-    })
     .catch((error) => {
       setError(error.message)
       
@@ -50,12 +57,6 @@ function LoginPage() {
     e.preventDefault();
     setError("")
     signInWithEmailAndPassword(auth,userCredentials.email, userCredentials.password)
-      .then((userCredential) => {
-        // Signed in 
-        dispatch(setUser({id:userCredential.user.uid, email:userCredential.user.email}))
-        console.log(userCredential.user);
-        // ...
-      })
       .catch((error) => {
         setError(error.message)
 
