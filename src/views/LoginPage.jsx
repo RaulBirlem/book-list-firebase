@@ -4,7 +4,7 @@ import {auth} from "../firebase/config.js"
 import {createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword  } from "firebase/auth";
-
+import { useDispatch } from 'react-redux';
 function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState('login');
